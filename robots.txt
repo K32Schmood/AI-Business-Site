@@ -17,4 +17,4 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://ponodigital.com/sitemap.xml
+Sitemap: https://k32schmood.github.io/AI-Business-Site/sitemap.xml
