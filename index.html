@@ -411,7 +411,7 @@ footer { background: var(--navy); color: var(--white); padding: 44px 0 36px; }
       <p class="hero-lede">You built the reputation one plate at a time. <strong>Pono Digital makes sure it shows up online.</strong> Websites, weekly social content, and email — handled by someone who grew up eating here.</p>
       <div class="hero-btns">
         <a href="#contact" class="btn-amber">Claim your free week</a>
-        <a href="#work" class="hero-link">See the work →</a>
+        <a href="/sample" class="hero-link">See the work →</a>
       </div>
     </div>
 
@@ -474,15 +474,7 @@ footer { background: var(--navy); color: var(--white); padding: 44px 0 36px; }
 
 <!-- ── TICKER ── -->
 <div class="ticker" aria-hidden="true">
-  <div class="ticker-track">
-    <span class="ticker-item">Kaneohe</span>
-    <span class="ticker-item">Kailua</span>
-    <span class="ticker-item">Haleiwa</span>
-    <span class="ticker-item">Waimanalo</span>
-    <span class="ticker-item">Honolulu</span>
-    <span class="ticker-item">Aiea</span>
-    <span class="ticker-item">Kapolei</span>
-    <span class="ticker-item">Waianae</span>
+  <div class="ticker-track" id="tickerTrack">
     <span class="ticker-item">Kaneohe</span>
     <span class="ticker-item">Kailua</span>
     <span class="ticker-item">Haleiwa</span>
@@ -798,6 +790,26 @@ footer { background: var(--navy); color: var(--white); padding: 44px 0 36px; }
 
 <script>
 (function () {
+
+  // ── TICKER: clone items until 4× viewport wide, then animate by exact pixel width ──
+  var tickerTrack = document.getElementById('tickerTrack');
+  if (tickerTrack) {
+    var origItems = Array.from(tickerTrack.children);
+    var origCount = origItems.length;
+    // Keep cloning until content is at least 4× viewport width
+    while (tickerTrack.scrollWidth < window.innerWidth * 4) {
+      origItems.forEach(function (item) {
+        tickerTrack.appendChild(item.cloneNode(true));
+      });
+    }
+    // Measure width of one original set in pixels
+    var setWidth = Math.round(tickerTrack.scrollWidth / (tickerTrack.children.length / origCount));
+    // Inject a precise keyframe that moves by exactly one set
+    var ks = document.createElement('style');
+    ks.textContent = '@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-' + setWidth + 'px)}}';
+    document.head.appendChild(ks);
+  }
+
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   // ── HERO: fires immediately on load, no scroll needed ──
