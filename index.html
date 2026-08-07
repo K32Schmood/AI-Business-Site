@@ -353,6 +353,35 @@ footer { background: var(--navy); color: var(--white); padding: 44px 0 36px; }
   .work-compare { grid-template-columns: 1fr; }
   .foot-in { flex-direction: column; gap: 24px; }
 }
+
+/* ── SCROLL ANIMATIONS ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.56s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.56s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.hero-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hero-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .hero-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -767,5 +796,76 @@ footer { background: var(--navy); color: var(--white); padding: 44px 0 36px; }
   </div>
 </footer>
 
+<script>
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  // ── HERO: fires immediately on load, no scroll needed ──
+  var heroItems = [
+    { sel: '.hero-kicker', delay: 0 },
+    { sel: '.hero h1',     delay: 0.13 },
+    { sel: '.hero-lede',   delay: 0.27 },
+    { sel: '.hero-btns',   delay: 0.40 },
+    { sel: '.hero-illo',   delay: 0.20 }
+  ];
+  heroItems.forEach(function (item) {
+    var el = document.querySelector(item.sel);
+    if (!el) return;
+    el.classList.add('hero-reveal');
+    el.style.transitionDelay = item.delay + 's';
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { el.classList.add('visible'); });
+    });
+  });
+
+  // ── SCROLL: single-reveal elements ──
+  [
+    '.sec-label', '.sec-title', '.sec-lede',
+    '.board-head', '.board-note',
+    '.work-ex', '.work-tags', '.work-compare',
+    '.pono-def', '.about-copy',
+    '.problem-body',
+    '.cta h2', '.cta p', '.btn-white', '.cta-note'
+  ].forEach(function (sel) {
+    document.querySelectorAll(sel).forEach(function (el) {
+      el.classList.add('reveal');
+    });
+  });
+
+  // ── SCROLL: staggered groups ──
+  [
+    { parent: '.stats-in',       childSel: null,        delay: 0.10 },
+    { parent: '.problem-points', childSel: null,        delay: 0.10 },
+    { parent: '.board',          childSel: '.board-row',delay: 0.09 },
+    { parent: '.steps-list',     childSel: '.step-row', delay: 0.10 },
+    { parent: '.creed-list',     childSel: '.creed-row',delay: 0.07 },
+    { parent: '.faq-inner',      childSel: 'details',   delay: 0.06 }
+  ].forEach(function (group) {
+    var parent = document.querySelector(group.parent);
+    if (!parent) return;
+    var kids = group.childSel
+      ? parent.querySelectorAll(group.childSel)
+      : parent.children;
+    Array.from(kids).forEach(function (child, i) {
+      child.classList.add('reveal');
+      child.style.transitionDelay = (i * group.delay) + 's';
+    });
+  });
+
+  // ── OBSERVER ──
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -28px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(function (el) {
+    observer.observe(el);
+  });
+}());
+</script>
 </body>
 </html>
